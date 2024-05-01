@@ -4,6 +4,18 @@ import Tooltip from "./tooltip";
 
 const app = document.getElementById("app");
 
+Tooltip.onUpdate((content) => {
+  console.log("update");
+});
+
+Tooltip.setActionAskAI(async (text) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve(text);
+    }, 3000);
+  });
+});
+
 class Component {
   constructor(body, item) {
     this.body;
@@ -13,7 +25,6 @@ class Component {
     const texts = item.items[0].content.split(/\n{2,}/);
     texts.forEach((text) => {
       const paragraph = document.createElement("p");
-      paragraph.id = "main_text";
       paragraph.setAttribute("edit-text", "");
       paragraph.style.whiteSpace = "pre-line";
       paragraph.innerText = text;
