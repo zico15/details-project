@@ -11,9 +11,11 @@ Tooltip.onUpdate((content) => {
 Tooltip.setActionAskAI(async (text) => {
   return new Promise((resolve, reject) => {
     setTimeout(() => {
-      resolve(text);
+      console.log("resolve: ", text);
+      resolve(true);
     }, 3000);
   });
+  return text;
 });
 
 class Component {

@@ -234,7 +234,7 @@ button:focus-visible {
   display: flex;
 }
 
-textarea {
+.edit-textarea {
   font-size: medium;
   line-height: 1.5;
   padding: 15px 10px;
