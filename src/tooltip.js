@@ -6,6 +6,7 @@ class _Tooltip {
   selections = [];
   optionsListSelected = undefined;
   selectedText = undefined;
+  default_colour = "red";
   defaultAction = async (text) => {
     return new Promise((resolve, reject) => {
       setTimeout(() => {
@@ -39,19 +40,77 @@ class _Tooltip {
 			<div class="tooltip-desable" role="button" tabindex="7" style="user-select: none;transition: background 20ms ease-in 0s;cursor: pointer;display: flex;align-items: center;padding: 0px 8px;color: #FFFFFF;box-shadow: rgba(255, 255, 255, 0.094) 1px 0px 0;"><img src="../../assets/img/loading-ai-2.gif" style="width: 15px; height: 15px;"/></div>
       <div role="button" tabindex="10" style="user-select: none;transition: opacity 200ms ease-in 0s;cursor: pointer;display: flex;align-items: center;flex-shrink: 0;width: 30px;border-radius: 0px;fill: rgba(255, 255, 255, 0.443);border-right: none;padding: 0px;justify-content: center;"><span style="margin-left: 5px;color: red;">X</span></div>
 			</div>
+      <div id="font-options" class="options-list" style="max-height: 300px; overflow-y: auto;" >
+        <div class="option" style="font-family: Arial">Arial</div>
+        <div class="option" style="font-family: 'Courier New'">Courier New</div>
+        <div class="option" style="font-family: 'Times New Roman'">Times New Roman</div>
+        <div class="option" style="font-family: 'Comic Sans MS'">Comic Sans MS</div>
+        <div class="option" style="font-family: 'Lucida Console'">Lucida Console</div>
+        <div class="option" style="font-family: 'Lucida Sans Unicode'">Lucida Sans Unicode</div>
+        <div class="option" style="font-family: 'Palatino Linotype'">Palatino Linotype</div>
+        <div class="option" style="font-family: 'Trebuchet MS'">Trebuchet MS</div>
+        <div class="option" style="font-family: 'Verdana'">Verdana</div>
+        <div class="option" style="font-family: 'Georgia'">Georgia</div>
+        <div class="option" style="font-family: 'Garamond'">Garamond</div>
+        <div class="option" style="font-family: 'Bookman Old Style'">Bookman Old Style</div>
+        <div class="option" style="font-family: 'Century Gothic'">Century Gothic</div>
+        <div class="option" style="font-family: 'Book Antiqua'">Book Antiqua</div>
+        <div class="option" style="font-family: 'Arial Black'">Arial Black</div>
+        <div class="option" style="font-family: 'Impact'">Impact</div>
+        <div class="option" style="font-family: 'Lucida Handwriting'">Lucida Handwriting</div>
+        <div class="option" style="font-family: 'Lucida Bright'">Lucida Bright</div>
+        <div class="option" style="font-family: 'Monotype Corsiva'">Monotype Corsiva</div>
+        <div class="option" style="font-family: 'Tahoma'">Tahoma</div>
+        <div class="option" style="font-family: 'Arial Narrow'">Arial Narrow</div>
+        <div class="option" style="font-family: 'Franklin Gothic Medium'">Franklin Gothic Medium</div>
+        <div class="option" style="font-family: 'MS Sans Serif'">MS Sans Serif</div>
+        <div class="option" style="font-family: 'MS Serif'">MS Serif</div>
+        <div class="option" style="font-family: 'MS Reference Sans Serif'">MS Reference Sans Serif</div>
+        <div class="option" style="font-family: 'MS Reference Specialty'">MS Reference Specialty</div>
+        <div class="option" style="font-family: 'MS Reference Serif'">MS Reference Serif</div>
+        <div class="option" style="font-family: 'MS Reference Sans Serif'">MS Reference Sans Serif</div>
+        <div class="option" style="font-family: 'MS Reference Specialty'">MS Reference Specialty</div>
+        <div class="option" style="font-family: 'MS Reference Serif'">MS Reference Serif</div>
+        <div class="option" style="font-family: 'MS Reference Sans Serif'">MS Reference Sans Serif</div>
+        <div class="option" style="font-family: 'MS Reference Specialty'">MS Reference Specialty</div>
+        <div class="option" style="font-family: 'MS Reference Serif'">MS Reference Serif</div>
+      </div>
       <div id="color-options" class="options-list" >
-      <grid id="grid-color-options" style="display: grid; grid-template-columns: repeat(3, 1fr); grid-gap: 5px; padding: 5px; justify-items: center;">
-          <div class="option" style="color: rgba(255, 255, 255, 0.87); padding: 1px; width: 90px; text-align: center; text-decoration: underline; cursor: pointer;">Default</div>
-          <div class="option" style="color: blue; padding: 1px; width: 90px; text-align: center; text-decoration: underline; cursor: pointer;">Blue</div>
-          <div class="option" style="color: red; padding: 1px; width: 90px; text-align: center; text-decoration: underline; cursor: pointer;">Red</div>
-          <div class="option" style="color: green; padding: 1px; width: 90px; text-align: center; text-decoration: underline; cursor: pointer;">Green</div>
-          <div class="option" style="color: yellow; padding: 1px; width: 90px; text-align: center; text-decoration: underline; cursor: pointer;">Yellow</div>
-          <div class="option" style="color: orange; padding: 1px; width: 90px; text-align: center; text-decoration: underline; cursor: pointer;">Orange</div>
-          <div class="option" style="color: purple; padding: 1px; width: 90px; text-align: center; text-decoration: underline; cursor: pointer;">Purple</div>
-          <div class="option" style="color: pink; padding: 1px; width: 90px; text-align: center; text-decoration: underline; cursor: pointer;">Pink</div>
-          <div class="option" style="color: brown; padding: 1px; width: 90px; text-align: center; text-decoration: underline; cursor: pointer;">Brown</div>          
-       
-			</grid>
+      <grid id="grid-color-options" style="display: grid; grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(5, 1fr); grid-gap: 5px; padding: 5px; justify-items: center">
+        <div class="option option-color" style="background: #ffffff"></div>
+        <div class="option option-color" style="background: #000106"></div>
+        <div class="option option-color" style="background: #3e6259"></div>
+        <div class="option option-color" style="background: #3f7a8a"></div>
+        <div class="option option-color" style="background: #95c483"></div>
+        <div class="option option-color" style="background: #b8d5c5"></div>
+        <div class="option option-color" style="background: #bdd6e7"></div>
+        <div class="option option-color" style="background: #7c91c1"></div>
+        <div class="option option-color" style="background: #9d8495"></div>
+        <div class="option option-color" style="background: #dad0d9"></div>
+        <div class="option option-color" style="background: #4c50cf"></div>
+        <div class="option option-color" style="background: #4f0b76"></div>
+        <div class="option option-color" style="background: #a565ba"></div>
+        <div class="option option-color" style="background: #ee3e6d"></div>
+        <div class="option option-color" style="background: #d83d64"></div>
+        <div class="option option-color" style="background: #c5a670"></div>
+        <div class="option option-color" style="background: #f56601"></div>
+        <div class="option option-color" style="background: #efacbd"></div>
+        <div class="option option-color" style="background: #8d0522"></div>
+        <div class="option option-color" style="background: #f1b99b"></div>
+        <div class="option option-color" style="background: #f0ca69"></div>
+        <div class="option option-color" style="background: #62372f"></div>
+        <div class="option option-color" style="background: #c97545"></div>
+        <div class="option option-color" style="background: #c1800d"></div>
+        <div class="option option-color" style="background: #ffffff; color: ${this.default_colour}; /* position: relative; */display: flex;align-content: space-between;align-items: center;justify-content: flex-end;">
+        <div style="
+        display: flex;
+        align-items: baseline;
+        justify-content: center;
+        margin: -17px;
+        margin-top: 7px;
+        margin-bottom: -13px; */
+ "> <div class="diagonal-line"></div></div></div>
+      </grid>
       </div>
       <div id="ask-ai-options" class="options-list">
         <div style="display: flex;">
@@ -67,11 +126,24 @@ class _Tooltip {
     const grid_color_options = this.tooltip.querySelector("#grid-color-options");
     grid_color_options.childNodes.forEach((e) => {
       e.onclick = () => {
-        this.updateTextAll(e.style.color);
+        const background = e.style.background;
+        const color = e.style.color.trim();
+        if (color != "") this.updateTextAll(e.style.color);
+        else this.updateTextAll(background);
       };
     });
 
     this.ask_ai_options_list = this.tooltip.querySelector("#ask-ai-options");
+    this.font_options_list = this.tooltip.querySelector("#font-options");
+
+    const fonts = Array.from(this.font_options_list.querySelectorAll(".option"));
+
+    fonts.forEach((e) => {
+      e.onclick = () => {
+        this.updateTextAll(undefined, e.style.fontFamily);
+      };
+    });
+
     const ask_ai_textarea = this.ask_ai_options_list.querySelector("textarea");
     const btnSend = this.tooltip.querySelector("#ask-ai-send");
     btnSend.onclick = () => {
@@ -84,6 +156,7 @@ class _Tooltip {
       ask_ai_textarea.value = "";
       this.ask_ai_options_list.classList.toggle("active");
       this.color_options_list.classList.remove("active");
+      this.font_options_list.classList.remove("active");
       this.optionsListSelected = this.ask_ai_options_list;
     };
     const color = this.tooltip.querySelector("[tabindex='2']");
@@ -93,6 +166,7 @@ class _Tooltip {
     };
     color.onclick = () => {
       this.ask_ai_options_list.classList.remove("active");
+      this.font_options_list.classList.remove("active");
       this.color_options_list.classList.toggle("active");
       this.optionsListSelected = this.color_options_list;
     };
@@ -123,7 +197,10 @@ class _Tooltip {
 
     this.font = this.tooltip.querySelector("[tabindex='3']");
     this.font.onclick = () => {
-      this.closeOptionsList();
+      this.ask_ai_options_list.classList.remove("active");
+      this.color_options_list.classList.remove("active");
+      this.font_options_list.classList.toggle("active");
+      this.optionsListSelected = this.font_options_list;
       console.log("Font");
     };
 
@@ -138,6 +215,7 @@ class _Tooltip {
     this.optionsListSelected = undefined;
     this.color_options_list.classList.remove("active");
     this.ask_ai_options_list.classList.remove("active");
+    this.font_options_list.classList.remove("active");
   }
 
   setVisibilityOptions(element) {
@@ -350,12 +428,18 @@ class _Tooltip {
     if (selection.elementSpan == undefined && (elementSpan == undefined || selection.isTextComplete == false)) {
       console.log(selection.element.childNodes.length);
       if (selection.element.childNodes.length == 1) this.createSpanParAll(selection, element, span);
+      else if (selection.previousElementSibling) this.createSpanPartLast(selection, element, span);
+      else if (selection.nextElementSibling) this.createSpanPartFirst(selection, element, span);
     }
   }
 
-  createSpanPartLast(selection, element, span) {}
+  createSpanPartLast(selection, element, span) {
+    console.log("createSpanPartLast: ", selection, element, span);
+  }
 
-  createSpanPartFirst(selection, element, span) {}
+  createSpanPartFirst(selection, element, span) {
+    console.log("createSpanPartFirst: ", selection, element, span);
+  }
 
   createSpanParAll(selection, element, span) {
     span.innerText = selection.text;
@@ -467,31 +551,31 @@ Tooltip.onUpdate((content) => {
   console.log("update");
 });
 
-//Tooltip.setActionAskAI(async (text, selectedText, paragraph) => {
-//  console.log("text: ", text);
-//  console.log("selectedText: ", selectedText);
-//  console.log("paragraph: ", paragraph);
+Tooltip.setActionAskAI(async (text, selectedText, paragraph) => {
+  console.log("text: ", text);
+  console.log("selectedText: ", selectedText);
+  console.log("paragraph: ", paragraph);
 
-//  return new Promise((resolve, reject) => {
-//    const myHeaders = new Headers();
-//    myHeaders.append("Content-Type", "application/json");
+  return new Promise((resolve, reject) => {
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
 
-//    const raw = JSON.stringify({
-//      userQuestion: text,
-//      userSelection: selectedText,
-//      context: paragraph[0],
-//    });
+    const raw = JSON.stringify({
+      userQuestion: text,
+      userSelection: selectedText,
+      context: paragraph[0],
+    });
 
-//    const requestOptions = {
-//      method: "POST",
-//      headers: myHeaders,
-//      body: raw,
-//      redirect: "follow",
-//    };
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: raw,
+      redirect: "follow",
+    };
 
-//    fetch("https://main-tlsfstft2a-uc.a.run.app/data", requestOptions)
-//      .then((response) => response.text())
-//      .then((result) => resolve(result))
-//      .catch(() => reject(""));
-//  });
-//});
+    fetch("https://main-tlsfstft2a-uc.a.run.app/data", requestOptions)
+      .then((response) => response.text())
+      .then((result) => resolve(result))
+      .catch(() => reject(""));
+  });
+});

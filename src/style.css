@@ -212,7 +212,7 @@ button:focus-visible {
 .option {
   padding: 8px 0;
   font-weight: 500;
-  font-size: 14px;
+  font-size: 20px;
   transition: 0.3s ease-in-out;
 }
 
@@ -232,6 +232,35 @@ button:focus-visible {
 
 .options-list.active {
   display: flex;
+}
+
+.option-color {
+  background: #fff;
+  -webkit-transition: all 0.2s ease;
+  transition: all 0.2s ease;
+  border-radius: 5px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.12);
+  box-sizing: border-box;
+  color: #fff;
+  background-color: #fff;
+  border: 1px solid transparent;
+  width: 30px;
+  height: 30px;
+  padding: 0 0 0 0;
+  margin: 0 0 0 0;
+  margin-bottom: 15px;
+  cursor: pointer;
+}
+
+.option-color:hover {
+  transform: scale(1.3);
+}
+
+.diagonal-line {
+  width: 38px;
+  height: 35px;
+  border-top: 2px solid red;
+  transform: rotate(310deg);
 }
 
 .edit-textarea {
