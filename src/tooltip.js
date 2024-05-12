@@ -19,43 +19,18 @@ const FontAll = [
 Font.whitelist = FontAll.map((e) => e.replace(/\s/g, "").toLowerCase());
 Quill.register(Font, true);
 
-const Block = Quill.import("blots/block");
-class CommentBlock extends Block {
-  static create(value) {
-    let node = super.create();
-    if (value == "comment") {
-      node.classList.add(value);
-    }
-    return node;
-  }
+var TestBlock = Quill.import("blots/block");
+class TestBlockBlot extends TestBlock {}
+TestBlockBlot.blotName = "test";
+TestBlockBlot.tagName = "p";
+TestBlockBlot.className = "details";
+Quill.register(TestBlockBlot);
 
-  static formats(node) {
-    let format = {};
-    if (node.classList.length > 0) {
-      format["customClass"] = Array.from(node.classList);
-    }
-    return format;
-  }
-
-  format(name, value) {
-    if (name === "customClass") {
-      if (value && Array.isArray(value)) {
-        // Adiciona as classes especificadas ao bloco de texto
-        value.forEach((className) => {
-          this.domNode.classList.add(className);
-        });
-      } else {
-        // Remove todas as classes do bloco de texto
-        this.domNode.className = "";
-      }
-    } else {
-      super.format(name, value);
-    }
-  }
-}
-
-CommentBlock.blotName = "custom-class";
-Quill.register(CommentBlock);
+class TestBlockBlot2 extends TestBlock {}
+TestBlockBlot2.blotName = "test2";
+TestBlockBlot2.tagName = "strong";
+TestBlockBlot2.className = "details-toggle";
+Quill.register(TestBlockBlot2);
 
 class Tooltip {
   spanSelection = undefined;
@@ -75,7 +50,7 @@ class Tooltip {
       }, 3000);
     });
   };
-  defaultActionPromise = undefined;
+  isDefaultActionRunning = false;
   defaultOnUpdate = (content) => {};
 
   constructor() {
@@ -181,7 +156,22 @@ class Tooltip {
     const ask_ai_textarea = this.ask_ai_options_list.querySelector("textarea");
     const btnSend = this.tooltip.querySelector("#ask-ai-send");
     btnSend.onclick = () => {
-      this.sendAskAI(ask_ai_textarea.value);
+      //this.sendAskAI(ask_ai_textarea.value);
+      const selection = this.quill.getSelection();
+      if (selection) {
+        const range = this.quill.getSelection();
+        const element = this.quill.getLeaf(range.index)[0]?.domNode.parentElement;
+        console.log("selection: ", element);
+        const newElementStrong = document.createElement("strong");
+        newElementStrong.className = "details-toggle";
+        newElementStrong.innerHTML = element.innerHTML;
+        const newElement = document.createElement("div");
+        newElement.className = "details-content";
+        newElement.appendChild(newElementStrong);
+        element.parentElement.replaceChild(newElement, element);
+        //this.quill.insertText(selection.index, "\n", "test", { value: "Bloco Personalizado" });
+        this.closeOptionsList();
+      }
     };
     this.color_options_list = this.tooltip.querySelector("#color-options");
     let isAction = false;
@@ -212,7 +202,7 @@ class Tooltip {
     const btnClose = this.tooltip.querySelector("[tabindex='10']");
     btnClose.onclick = () => {
       this.hide();
-      if (this.defaultActionPromise != undefined) this.this.defaultActionPromise = undefined;
+      this.isDefaultActionRunning = false;
     };
     this.popup.className = "popup";
     this.popup.appendChild(this.tooltip);
@@ -230,6 +220,14 @@ class Tooltip {
     this.quill = new Quill("#editor", {
       modules: { toolbar: "#toolbar" },
       theme: "snow",
+    });
+
+    this.quill.clipboard.addMatcher(Node.ELEMENT_NODE, function (node, delta) {
+      delta.attributes = delta.attributes || {};
+      if (node.classList.contains("custom-details")) {
+        delta.attributes.class = "custom-details"; // Mantenha a classe 'custom-details'
+      }
+      return delta;
     });
   }
 
@@ -267,31 +265,25 @@ class Tooltip {
       e.classList.toggle("tooltip-desable");
     });
     const paragraph = this.selections.filter((e) => e.element.tagName == "P").map((e) => e.element.innerText);
-    this.defaultActionPromise = new Promise((resolve, reject) => {
-      this.defaultAction(value, this.selectedText, paragraph)
-        .then((result) => {
-          if (this.defaultActionPromise == undefined) reject();
-          console.log("result: ", result);
-          const enables = this.tooltip.querySelectorAll(".tooltip-enable");
-          const desables = this.tooltip.querySelectorAll(".tooltip-desable");
-          enables.forEach((e) => {
-            e.classList.toggle("tooltip-enable");
-            e.classList.toggle("tooltip-desable");
-          });
-          desables.forEach((e) => {
-            e.classList.toggle("tooltip-enable");
-            e.classList.toggle("tooltip-desable");
-          });
-          const main_paragraph = this.selections[0];
-          this.createDetails(main_paragraph?.element, result);
-        })
-        .finally(() => {
-          this.isAction = false;
-          this.defaultActionPromise = undefined;
-          resolve();
+    this.isDefaultActionRunning = true;
+    this.defaultAction(value, this.selectedText, paragraph)
+      .then((result) => {
+        const enables = this.tooltip.querySelectorAll(".tooltip-enable");
+        const desables = this.tooltip.querySelectorAll(".tooltip-desable");
+        enables.forEach((e) => {
+          e.classList.toggle("tooltip-enable");
+          e.classList.toggle("tooltip-desable");
         });
-    });
-    this.defaultActionPromise();
+        desables.forEach((e) => {
+          e.classList.toggle("tooltip-enable");
+          e.classList.toggle("tooltip-desable");
+        });
+        if (this.isDefaultActionRunning == true) this.createDetails(main_paragraph?.element, result);
+      })
+      .finally(() => {
+        this.isAction = false;
+        this.isDefaultActionRunning = false;
+      });
   }
 
   setSelection(value) {
@@ -307,86 +299,81 @@ class Tooltip {
     this.selections = [];
     this.selectedText = text;
     this.closeOptionsList();
-    //this.setSelection(undefined);
-    //this.setVisibilityOptions(undefined);
-    //this.data = {
-    //  "element-start": startElement,
-    //  "element-end": endElement,
-    //  "text-select": text,
-    //  rect: rect,
-    //};
-    //for (let i = 0; i < selection.rangeCount; i++) {
-    //  const range = selection.getRangeAt(i);
-    //  const startElement = range.startContainer.nodeType === Node.TEXT_NODE ? range.startContainer.parentElement : range.startContainer;
-    //  const endElement = range.endContainer.nodeType === Node.TEXT_NODE ? range.endContainer.parentElement : range.endContainer;
-    //  // entre start e end no node
-    //  console.log("startElement: ", startElement);
-    //  console.log("endElement: ", endElement);
-    //  let elementsAll = Array.form(document.querySelectorAll("p[edit-text]"));
-    //  const op = [];
-    //  for (let i = 0; i < elementsAll.length; i++) {
-    //    const elements = elementsAll[i].querySelectorAll("[edit-text]");
-    //    op.push({ element: elementsAll[i], elements: elements });
-    //  }
-    //  for (let i = 0; i < op.length; i++) {
-    //    elementsAll = Array.prototype.splice.apply(elementsAll, [elementsAll.indexOf(op[i].element), 0].concat(novosElementos));
-    //  }
-    //  console.log("elementsAll: ", elementsAll);
-    //  let elements = [];
-    //  let countElementEditSummary = 0;
-    //  let isStart = false;
-    //  let isEnd = false;
-    //  for (let i = 0; i < elementsAll.length; i++) {
-    //    if (isStart == false && elementsAll[i] === startElement) {
-    //      isStart = true;
-    //      alert("start");
-    //    }
+    this.setSelection(undefined);
+    this.setVisibilityOptions(undefined);
+    this.data = {
+      "element-start": startElement,
+      "element-end": endElement,
+      "text-select": text,
+      rect: rect,
+    };
+    var selectedStrongElements = this.getSelectedStrongElements(this.quill);
+    console.log("Elementos strong selecionados:", selectedStrongElements);
+    for (let i = 0; i < selection.rangeCount; i++) {
+      const range = selection.getRangeAt(i);
+      const startElement = range.startContainer.nodeType === Node.TEXT_NODE ? range.startContainer.parentElement : range.startContainer;
+      const endElement = range.endContainer.nodeType === Node.TEXT_NODE ? range.endContainer.parentElement : range.endContainer;
+      this.selections.push({
+        element: startElement,
+        start: range.startOffset,
+        end: range.endOffset,
+      });
+      console.log("startElement: ", startElement);
+      //const elementsAll = document.querySelectorAll("[edit-text]");
+      ////console.log("elementsAll: ", elementsAll);
+      //let elements = [];
+      //let countElementEditSummary = 0;
+      //let isStart = false;
+      //let isEnd = false;
+      //for (let i = 0; i < elementsAll.length; i++) {
+      //  if (isStart == false && elementsAll[i] === startElement) {
+      //    isStart = true;
+      //  }
 
-    //    if (elementsAll[i] === endElement) {
-    //      isEnd = true;
-    //    }
-    //    if (isStart || isEnd) {
-    //      elements.push(elementsAll[i]);
-    //      if (elementsAll[i].getAttribute("edit-summary") == "true") countElementEditSummary++;
-    //    }
-    //    if (isEnd && isStart) break;
-    //  }
+      //  if (elementsAll[i] === endElement) {
+      //    isEnd = true;
+      //  }
+      //  if (isStart || isEnd) {
+      //    elements.push(elementsAll[i]);
+      //    if (elementsAll[i].getAttribute("edit-summary") == "true") countElementEditSummary++;
+      //  }
+      //  if (isEnd && isStart) break;
+      //}
 
-    //  if (countElementEditSummary != elements.length) {
-    //    for (let i = 0; i < elements.length; i++) {
-    //      if (elements[i].getAttribute("edit-summary") == "true") {
-    //        elements.splice(i, 1);
-    //        i--;
-    //      }
-    //    }
-    //  }
+      //if (countElementEditSummary != elements.length) {
+      //  for (let i = 0; i < elements.length; i++) {
+      //    if (elements[i].getAttribute("edit-summary") == "true") {
+      //      elements.splice(i, 1);
+      //      i--;
+      //    }
+      //  }
+      //}
 
-    //  for (let i = 0; i < elements.length; i++) {
-    //    const el = {
-    //      element: elements[i],
-    //      start: elements[i] == startElement ? range.startOffset : 0,
-    //      end: elements[i] == endElement ? range.endOffset : elements[i].innerText.length,
-    //      color: elements[i].style.color,
-    //      font: elements[i].style.fontFamily,
-    //      underline: elements[i].style.textDecoration == "underline",
-    //      bold: elements[i].style.fontWeight == "bold",
-    //      strikethrough: elements[i].style.textDecoration == "line-through",
-    //      italic: elements[i].style.fontStyle == "italic",
-    //      comment: elements[i].className == "comment" ? true : false,
-    //      text: elements[i] == startElement ? range.startContainer.data : elements[i] == endElement ? range.endContainer.data : "",
-    //      isTextComplete: false,
-    //      elementSpan: undefined,
-    //      nextElementSibling: elements[i] == startElement ? range.startContainer.nextElementSibling : elements[i] == endElement ? range.endContainer.nextElementSibling : undefined,
-    //      previousElementSibling: elements[i] == startElement ? range.startContainer.previousElementSibling : elements[i] == endElement ? range.endContainer.previousElementSibling : undefined,
-    //      preview: this.getPreViewElement(elements, i),
-    //      next: this.getNextViewElement(elements, i),
-    //    };
-    //    el.isTextComplete = el.start + el.end == el.element.innerText.length;
-    //    el.text = this.updateContent(el);
-    //    this.selections.push(el);
-    //  }
-    //}
-    //console.log(this.selections);
+      //for (let i = 0; i < elements.length; i++) {
+      //  const el = {
+      //    element: elements[i],
+      //    start: elements[i] == startElement ? range.startOffset : 0,
+      //    end: elements[i] == endElement ? range.endOffset : elements[i].innerText.length,
+      //    color: elements[i].style.color,
+      //    font: elements[i].style.fontFamily,
+      //    underline: elements[i].style.textDecoration == "underline",
+      //    bold: elements[i].style.fontWeight == "bold",
+      //    strikethrough: elements[i].style.textDecoration == "line-through",
+      //    italic: elements[i].style.fontStyle == "italic",
+      //    comment: elements[i].className == "comment" ? true : false,
+      //    text: elements[i] == startElement ? range.startContainer.data : elements[i] == endElement ? range.endContainer.data : "",
+      //    isTextComplete: false,
+      //    elementSpan: undefined,
+      //    nextElementSibling: elements[i] == startElement ? range.startContainer.nextElementSibling : elements[i] == endElement ? range.endContainer.nextElementSibling : undefined,
+      //    previousElementSibling: elements[i] == startElement ? range.startContainer.previousElementSibling : elements[i] == endElement ? range.endContainer.previousElementSibling : undefined,
+      //    preview: this.getPreViewElement(elements, i),
+      //    next: this.getNextViewElement(elements, i),
+      //  };
+      //  el.isTextComplete = el.start + el.end == el.element.innerText.length;
+      //  el.text = this.updateContent(el);
+      //  this.selections.push(el);
+      //}
+    }
     this.tooltip.style.top = `${rect.top + window.scrollY - this.tooltip.clientHeight - 20}px`;
     this.tooltip.style.left = `${rect.left + window.scrollX + rect.width / 2 - 30}px`;
     if (this.tooltip.style.left < 0) this.tooltip.style.left = "10px";
@@ -394,7 +381,6 @@ class Tooltip {
     if (size > window.innerWidth) {
       this.tooltip.style.left = `${window.innerWidth - this.tooltip.clientWidth - 20}px`;
     }
-    //if (this.selections.length == 0) this.hide();
   }
 
   getPreViewElement(elements, i) {
@@ -480,6 +466,51 @@ class Tooltip {
     }
   }
 
+  getSelectedElementsOfType(editor, elementType) {
+    const selection = editor.getSelection();
+    if (!selection) {
+      return [];
+    }
+
+    const delta = editor.getContents(selection.index, selection.length);
+    const selectedElements = [];
+
+    delta.ops.forEach((op) => {
+      const attributes = op.attributes || {};
+      if (attributes && attributes[elementType]) {
+        selectedElements.push(op.insert);
+      }
+    });
+
+    return selectedElements;
+  }
+
+  getSelectedStrongElements(editor) {
+    const selection = editor.getSelection();
+    if (!selection) {
+      return [];
+    }
+
+    const delta = editor.getContents(selection.index, selection.length);
+    const selectedElements = [];
+
+    delta.ops.forEach((op) => {
+      if (op.attributes && op.attributes.bold) {
+        selectedElements.push(op.insert);
+      } else if (op.insert && typeof op.insert === "string") {
+        // Se o texto não estiver em negrito, verificamos se está contido em uma operação de "insert" anterior em negrito
+        const lastOp = selectedElements[selectedElements.length - 1];
+        if (typeof lastOp === "string") {
+          selectedElements[selectedElements.length - 1] = lastOp + op.insert;
+        } else {
+          selectedElements.push(op.insert);
+        }
+      }
+    });
+
+    return selectedElements;
+  }
+
   createSpanPartLast(selection, element, span) {
     console.log("createSpanPartLast: ", selection, element, span);
     span.innerText = selection.text.substring(selection.start, selection.end);
@@ -558,12 +589,13 @@ class Tooltip {
   }
 
   createDetails(main_paragraph, response) {
+    console.log("createDetails: ", main_paragraph);
     if (main_paragraph == undefined) return;
 
-    if (main_paragraph.tagName == "SPAN") main_paragraph = this.getParentParagraph(main_paragraph);
+    //if (main_paragraph.tagName == "SPAN") main_paragraph = this.getParentParagraph(main_paragraph);
     //  console.log("main_1: ", main_paragraph);
     //  if (main_paragraph == undefined) return;
-    if (main_paragraph.tagName == "P") main_paragraph = this.getParentDetails(main_paragraph);
+    //if (main_paragraph.tagName == "P") main_paragraph = this.getParentDetails(main_paragraph);
     console.log("createDetails: ", main_paragraph);
     //let detail = Array.from(main_paragraph.childNodes).find((e) => e.tagName == "DETAILS");
     //console.log("main_paragraph: ", main_paragraph, " detail: ", detail);
@@ -575,26 +607,28 @@ class Tooltip {
     //detail = Array.from(main_paragraph.childNodes).find((e) => e.tagName == "DETAILS");
     //if (detail != undefined) main_paragraph = detail;
     let details = undefined;
-    if (main_paragraph && main_paragraph.tagName != "DETAILS") {
-      details = document.createElement("details");
-      const summary = document.createElement("summary");
-      details.appendChild(summary);
-      summary.style.listStylePosition = "outside";
-      summary.innerHTML = main_paragraph.outerHTML;
-      main_paragraph.innerHTML = "";
-      main_paragraph.removeAttribute("edit-text");
-      main_paragraph.appendChild(details);
-    } else {
-      details = main_paragraph;
-      console.log("details: ", details);
-    }
-    if (details == undefined) return;
+    //if (main_paragraph && main_paragraph.tagName != "DETAILS") {
+    details = document.createElement("details");
+    const summary = document.createElement("summary");
+    details.appendChild(summary);
+    summary.style.listStylePosition = "outside";
+    console.log("main_paragraph: ", main_paragraph.outerHTML);
+    summary.innerHTML = main_paragraph.outerHTML;
+    main_paragraph.innerHTML = "";
+    main_paragraph.removeAttribute("edit-text");
+    main_paragraph.appendChild(details);
+    //} else {
+    //  details = main_paragraph;
+    //  console.log("details: ", details);
+    //}
+    //if (details == undefined) return;
     const paragraph = document.createElement("p");
     paragraph.setAttribute("edit-text", "");
     paragraph.setAttribute("edit-summary", "true");
     paragraph.innerHTML = response;
     paragraph.style.color = "red";
     details.appendChild(paragraph);
+    return main_paragraph.outerHTML;
   }
 
   onUpdate(e) {

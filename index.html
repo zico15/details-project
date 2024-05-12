@@ -22,7 +22,24 @@
     <link href="https://cdn.quilljs.com/1.0.0/quill.snow.css" rel="stylesheet" />
     <script src="https://cdn.quilljs.com/1.0.0/quill.js"></script>
 
-    <div id="editor" tooltip-div></div>
+    <div id="editor" tooltip-div>
+      <div>
+        <p class="custom-details">
+          <p class="custom-details-toggle">Mostrar detalhes</p>
+          <p class="custom-details-content" contenteditable="true">Conteúdo dos detalhes aqui...</p>
+        </p>
+      </div>
+    </div>
+
+    <script>
+      document.querySelectorAll(".ql-editor").forEach((toggle) => {
+        toggle.addEventListener("click", () => {
+          const details = toggle.parentElement;
+          details.toggleAttribute("open");
+          console.log(details);
+        });
+      });
+    </script>
 
     <script type="module" src="src/main.js"></script>
   </body>

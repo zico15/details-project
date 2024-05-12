@@ -68,33 +68,33 @@ function init() {
     console.log("update");
   });
 
-  tooltip.setActionAskAI(async (text, selectedText, paragraph) => {
-    console.log("text: ", text);
-    console.log("selectedText: ", selectedText);
-    console.log("paragraph: ", paragraph);
+  //tooltip.setActionAskAI(async (text, selectedText, paragraph) => {
+  //  console.log("text: ", text);
+  //  console.log("selectedText: ", selectedText);
+  //  console.log("paragraph: ", paragraph);
 
-    return new Promise((resolve, reject) => {
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
+  //  return new Promise((resolve, reject) => {
+  //    const myHeaders = new Headers();
+  //    myHeaders.append("Content-Type", "application/json");
 
-      const raw = JSON.stringify({
-        userQuestion: text,
-        userSelection: selectedText,
-        context: paragraph[0],
-      });
+  //    const raw = JSON.stringify({
+  //      userQuestion: text,
+  //      userSelection: selectedText,
+  //      context: paragraph[0],
+  //    });
 
-      const requestOptions = {
-        method: "POST",
-        headers: myHeaders,
-        body: raw,
-        redirect: "follow",
-      };
-      fetch("https://main-tlsfstft2a-uc.a.run.app/data", requestOptions)
-        .then((response) => response.text())
-        .then((result) => resolve(result))
-        .catch(() => reject(""));
-    });
-  });
+  //    const requestOptions = {
+  //      method: "POST",
+  //      headers: myHeaders,
+  //      body: raw,
+  //      redirect: "follow",
+  //    };
+  //    fetch("https://main-tlsfstft2a-uc.a.run.app/data", requestOptions)
+  //      .then((response) => response.text())
+  //      .then((result) => resolve(result))
+  //      .catch(() => reject(""));
+  //  });
+  //});
 }
 
 init();

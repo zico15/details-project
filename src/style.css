@@ -28,8 +28,27 @@ body {
   place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  padding: 20px !important;
 }
 
+custom-details {
+  display: inline-block;
+  padding: 5px;
+  background-color: lightblue;
+  border: 1px solid blue;
+}
+
+.details-content {
+  display: none;
+}
+
+.details[open] .details-content {
+  display: block;
+}
+
+.details-toggle {
+  cursor: pointer;
+}
 /* Arial */
 .ql-font-arial {
   font-family: Arial, sans-serif;
