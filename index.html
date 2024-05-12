@@ -38,5 +38,34 @@
       </grid>
     </div>-->
     <script type="module" src="src/main.js"></script>
+    <!--<script>
+      function reorganizeList(list) {
+        let newList = [];
+        let p = undefined;
+        while (list.length > 0) {
+          const e = list.shift();
+
+          if (p == undefined) {
+            if (e.includes("p")) p = e;
+            else newList.push(e);
+          } else {
+            if (!e.includes("p")) {
+              newList.push(e);
+            } else {
+              newList.push(p);
+              p = e;
+            }
+          }
+        }
+        if (p) newList.push(p);
+
+        return newList;
+      }
+
+      // Exemplo de uso:
+      const originalList = ["a", "g", "h", "p1", "a", "c", "p2", "b", "p3", "c"];
+      const reorganizedList = reorganizeList(originalList);
+      console.log("reorganizedList: ", reorganizedList);
+    </script>-->
   </body>
 </html>

@@ -283,6 +283,64 @@ class _Tooltip {
     if (e != undefined) this.defaultAction = e;
   }
 
+  reorganizeList(list) {
+    let newList = [];
+    let p = undefined;
+    while (list.length > 0) {
+      const e = list.shift();
+
+      if (p == undefined) {
+        if (e.tagName == "P") p = e;
+        else newList.push(e);
+      } else {
+        if (!e.tagName == "P") {
+          newList.push(e);
+        } else {
+          newList.push(p);
+          p = e;
+        }
+      }
+    }
+    if (p) newList.push(p);
+    return newList;
+  }
+
+  createElementData(element, start, end, range, startParachraph, endParachraph) {
+    const data = {
+      element: element,
+      startOffset: element == start ? range.startOffset : 0,
+      endOffset: element == end ? range.endOffset : element.innerText.length,
+    };
+
+    if (element == startParachraph && start != startParachraph) {
+      const startOffset = startParachraph.innerHTML.indexOf(start.outerHTML) + start.innerText.length;
+      console.log("startOffset: ", startOffset);
+      data.startOffset = startOffset;
+    }
+    if (element == endParachraph && end != endParachraph) {
+      const endOffset = endParachraph.innerHTML.indexOf(end.outerHTML);
+      console.log("endOffset: ", endOffset);
+      data.endOffset = endOffset;
+    }
+
+    return data;
+  }
+
+  getElementsBetween(start, end, range) {
+    const selections = [];
+    const startParachraph = this.getParentParagraph(start);
+    const endParachraph = this.getParentParagraph(end);
+    if (startParachraph == endParachraph && start == startParachraph && end == endParachraph) return [start];
+    let isStart = false;
+    const elementsAll = this.reorganizeList(Array.from(document.querySelectorAll("[edit-text]")));
+    for (let i = 0; i < elementsAll.length; i++) {
+      if (isStart == false && elementsAll[i] == startParachraph) isStart = true;
+      if (isStart) selections.push(this.createElementData(elementsAll[i], start, end, range, startParachraph, endParachraph));
+      if (elementsAll[i] == end) break;
+    }
+    return selections;
+  }
+
   show(text, rect, selection, startElement, endElement) {
     this.popup.style.display = "flex";
     this.selections = [];
@@ -297,9 +355,11 @@ class _Tooltip {
     };
     for (let i = 0; i < selection.rangeCount; i++) {
       const range = selection.getRangeAt(i);
+      console.log("range: ", range);
       const startElement = range.startContainer.nodeType === Node.TEXT_NODE ? range.startContainer.parentElement : range.startContainer;
       const endElement = range.endContainer.nodeType === Node.TEXT_NODE ? range.endContainer.parentElement : range.endContainer;
-      const elementsAll = document.querySelectorAll("[edit-text]");
+      console.log("elements between: ", this.getElementsBetween(startElement, endElement, range));
+      const elementsAll = this.reorganizeList(Array.from(document.querySelectorAll("[edit-text]")));
       let elements = [];
       let countElementEditSummary = 0;
       let isStart = false;
@@ -346,7 +406,7 @@ class _Tooltip {
         this.selections.push(el);
       }
     }
-    console.log(this.selections);
+    console.log("selections: ", this.selections);
     this.tooltip.style.top = `${rect.top + window.scrollY - this.tooltip.clientHeight - 20}px`;
     this.tooltip.style.left = `${rect.left + window.scrollX + rect.width / 2 - 30}px`;
     if (this.tooltip.style.left < 0) this.tooltip.style.left = "10px";
@@ -426,7 +486,6 @@ class _Tooltip {
     if (italic != undefined) span.style.fontStyle = italic ? "italic" : "normal";
     if (comment != undefined) span.className = comment ? "comment" : "";
     if (selection.elementSpan == undefined && (elementSpan == undefined || selection.isTextComplete == false)) {
-      console.log(selection.element.childNodes.length);
       if (selection.element.childNodes.length == 1) this.createSpanParAll(selection, element, span);
       else if (selection.previousElementSibling) this.createSpanPartLast(selection, element, span);
       else if (selection.nextElementSibling) this.createSpanPartFirst(selection, element, span);
@@ -442,10 +501,11 @@ class _Tooltip {
   }
 
   createSpanParAll(selection, element, span) {
+    console.log("createSpanParAll: ", selection, element, span);
     span.innerText = selection.text;
     span.id = `span_text_${this.serializabel++}_${new Date().getTime()}`;
     span.setAttribute("edit-text", "");
-    const html = element.innerText;
+    const html = element.innerHTML;
     const htmlStart = html.substring(0, selection.start);
     const htmlEnd = html.substring(selection.end, html.length);
     const outerHTML = span.outerHTML;
@@ -453,8 +513,9 @@ class _Tooltip {
     selection.elementSpan = element.querySelector(`#${span.id}`);
   }
 
-  getParentParagraph(span) {
-    let parent = span;
+  getParentParagraph(value) {
+    if (value.tagName == "P") return value;
+    let parent = value;
     while (parent.tagName != "P") {
       parent = parent.parentElement;
       if (parent != undefined && parent.tagName == "P") return parent;
