@@ -5,38 +5,25 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vite App</title>
+    <!-- Main Quill library -->
+    <script src="//cdn.quilljs.com/1.0.0/quill.js"></script>
+    <script src="//cdn.quilljs.com/1.0.0/quill.min.js"></script>
+
+    <!-- Theme included stylesheets -->
+    <link href="//cdn.quilljs.com/1.0.0/quill.snow.css" rel="stylesheet" />
+    <link href="//cdn.quilljs.com/1.0.0/quill.bubble.css" rel="stylesheet" />
+
+    <!-- Core build with no theme, formatting, non-essential modules -->
+    <link href="//cdn.quilljs.com/1.0.0/quill.core.css" rel="stylesheet" />
+    <script src="//cdn.quilljs.com/1.0.0/quill.core.js"></script>
   </head>
   <body>
-    <div id="app" tooltip-div></div>
-    <!--
-    <div id="color-options" style="width: 300px; background: firebrick">
-      <grid id="grid-color-options" style="display: grid; grid-template-columns: repeat(5, 5); grid-gap: 5px; padding: 5px; justify-items: center">
-        <div class="option option-color" style="background: #ffffff"></div>
-        <div class="option option-color" style="background: #000106"></div>
-        <div class="option option-color" style="background: #3e6259"></div>
-        <div class="option option-color" style="background: #3f7a8a"></div>
-        <div class="option option-color" style="background: #95c483"></div>
-        <div class="option option-color" style="background: #b8d5c5"></div>
-        <div class="option option-color" style="background: #bdd6e7"></div>
-        <div class="option option-color" style="background: #7c91c1"></div>
-        <div class="option option-color" style="background: #9d8495"></div>
-        <div class="option option-color" style="background: #dad0d9"></div>
-        <div class="option option-color" style="background: #4c50cf"></div>
-        <div class="option option-color" style="background: #4f0b76"></div>
-        <div class="option option-color" style="background: #a565ba"></div>
-        <div class="option option-color" style="background: #ee3e6d"></div>
-        <div class="option option-color" style="background: #d83d64"></div>
-        <div class="option option-color" style="background: #c5a670"></div>
-        <div class="option option-color" style="background: #f56601"></div>
-        <div class="option option-color" style="background: #efacbd"></div>
-        <div class="option option-color" style="background: #8d0522"></div>
-        <div class="option option-color" style="background: #f1b99b"></div>
-        <div class="option option-color" style="background: #f0ca69"></div>
-        <div class="option option-color" style="background: #62372f"></div>
-        <div class="option option-color" style="background: #c97545"></div>
-        <div class="option option-color" style="background: #c1800d"></div>
-      </grid>
-    </div>-->
+    <!-- Include Quill stylesheet -->
+    <link href="https://cdn.quilljs.com/1.0.0/quill.snow.css" rel="stylesheet" />
+    <script src="https://cdn.quilljs.com/1.0.0/quill.js"></script>
+
+    <div id="editor" tooltip-div></div>
+
     <script type="module" src="src/main.js"></script>
   </body>
 </html>
