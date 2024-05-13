@@ -305,40 +305,82 @@ class _Tooltip {
     return newList;
   }
 
+  createElementLink(element, links, start, end, range) {
+    const childs = Array.from(element.childNodes);
+    console.log("childs: ", childs);
+    for (let i = 0; i < childs.length; i++) {
+      const data = {
+        element: element,
+        startOffset: i == 0 ? 0 : element.innerHTML.indexOf(childs[i - 1].outerHTML) + childs[i - 1]?.innerText?.length,
+        endOffset: element.innerHTML.indexOf(childs[i].outerHTML),
+      };
+      links.push(data);
+    }
+  }
+
   createElementData(element, start, end, range, startParachraph, endParachraph) {
     const data = {
       element: element,
       startOffset: element == start ? range.startOffset : 0,
       endOffset: element == end ? range.endOffset : element.innerText.length,
+      nextElementSibling: undefined,
+      previousElementSibling: undefined,
+      isComplet: true,
     };
 
     if (element == startParachraph && start != startParachraph) {
       const startOffset = startParachraph.innerHTML.indexOf(start.outerHTML) + start.innerText.length;
-      console.log("startOffset: ", startOffset);
       data.startOffset = startOffset;
     }
     if (element == endParachraph && end != endParachraph) {
       const endOffset = endParachraph.innerHTML.indexOf(end.outerHTML);
-      console.log("endOffset: ", endOffset);
       data.endOffset = endOffset;
     }
+    data.isComplet = data.startOffset + data.endOffset == element.innerText.length;
 
     return data;
   }
 
+  getChildsText(element, start, end, range) {
+    if (element == undefined) return [];
+    if (element.nodeType == Node.TEXT_NODE) return [element];
+    const childs = Array.from(element?.childNodes || []);
+    const childsAll = [];
+    for (let i = 0; i < childs.length; i++) {
+      if (childs[i].nodeType == Node.TEXT_NODE) {
+        const data = {
+          element: childs[i],
+          parent: element,
+          startOffset: element == start ? range.startOffset : 0,
+          endOffset: element == end ? range.endOffset : childs[i].length,
+          isTextComplete: true,
+        };
+        data.isTextComplete = data.startOffset + data.endOffset == childs[i].length;
+        childsAll.push(data);
+      } else {
+        childsAll.push(...this.getChildsText(childs[i], start, end, range));
+      }
+    }
+    return childsAll;
+  }
+
   getElementsBetween(start, end, range) {
-    const selections = [];
+    const elements = [];
+    const links = [];
     const startParachraph = this.getParentParagraph(start);
     const endParachraph = this.getParentParagraph(end);
-    if (startParachraph == endParachraph && start == startParachraph && end == endParachraph) return [start];
+    //if (startParachraph == endParachraph && start == startParachraph && end == endParachraph) return [start];
     let isStart = false;
-    const elementsAll = this.reorganizeList(Array.from(document.querySelectorAll("[edit-text]")));
+    const elementsAll = this.reorganizeList(Array.from(document.querySelectorAll("p[edit-text]")));
     for (let i = 0; i < elementsAll.length; i++) {
       if (isStart == false && elementsAll[i] == startParachraph) isStart = true;
-      if (isStart) selections.push(this.createElementData(elementsAll[i], start, end, range, startParachraph, endParachraph));
-      if (elementsAll[i] == end) break;
+      if (isStart) elements.push(...this.getChildsText(elementsAll[i], start, end, range));
+      if (elementsAll[i] == endParachraph) break;
     }
-    return selections;
+    //for (let i = 0; i < selections.length; i++) {
+    //  this.createElementLink(selections[i].element, links, start, end, range);
+    //}
+    return elements;
   }
 
   show(text, rect, selection, startElement, endElement) {
